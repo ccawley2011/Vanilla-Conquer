@@ -54,6 +54,8 @@ else()
     if(WIN32)
         string(APPEND CMAKE_EXE_LINKER_FLAGS " -static-libstdc++ -static-libgcc")
         string(APPEND CMAKE_SHARED_LINKER_FLAGS " -static-libstdc++ -static-libgcc")
+    elseif(RISCOS)
+        string(APPEND CMAKE_EXE_LINKER_FLAGS " -static")
     endif()
 endif()
 

@@ -118,6 +118,10 @@ bool Set_Video_Mode(int w, int h, int bits_per_pixel)
         win_flags |= SDL_FULLSCREEN;
     }
 
+#ifdef __riscos__
+    win_flags |= SDL_DOUBLEBUF;
+#endif
+
     window = SDL_SetVideoMode(w, h, 8, win_flags);
     if (window == nullptr) {
         DBG_ERROR("SDL_SetVideoMode failed: %s", SDL_GetError());
@@ -166,6 +170,10 @@ void Toggle_Video_Fullscreen()
         if (!Settings.Video.Windowed) {
             win_flags |= SDL_FULLSCREEN;
         }
+
+#ifdef __riscos__
+        win_flags |= SDL_DOUBLEBUF;
+#endif
 
         new_window = SDL_SetVideoMode(window->w, window->h, 8, win_flags);
         if (new_window) {

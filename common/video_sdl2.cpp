@@ -37,6 +37,11 @@
 
 /*= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =*/
 
+#ifdef __riscos__
+/* This is needed to make std::stof() available */
+#define _GLIBCXX_USE_C99 1
+#endif
+
 #include "gbuffer.h"
 #include "palette.h"
 #include "video.h"
