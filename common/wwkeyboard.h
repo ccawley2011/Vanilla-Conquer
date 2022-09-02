@@ -877,7 +877,7 @@ public:
     void Close_Controller();
     bool Is_Analog_Scroll_Active();
     unsigned char Get_Scroll_Direction();
-#elif defined(SDL1_BUILD)
+#elif 0 // defined(SDL1_BUILD)
     bool Is_Gamepad_Active()
     {
         return false;

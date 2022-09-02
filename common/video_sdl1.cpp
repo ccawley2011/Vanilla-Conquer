@@ -53,20 +53,13 @@ static SDL_Color logpal[256], physpal[256];
 
 static struct
 {
-    int GameW;
-    int GameH;
-    bool Clip;
     void* Raw;
     int W;
     int H;
     int HotX;
     int HotY;
-    float X;
-    float Y;
     SDL_Surface* Surface;
 } hwcursor;
-
-static void Update_HWCursor();
 
 class SurfaceMonitorClassDummy : public SurfaceMonitorClass
 {
@@ -133,24 +126,6 @@ bool Set_Video_Mode(int w, int h, int bits_per_pixel)
              window->h,
              window->format->BitsPerPixel);
 
-    /*
-    ** Set mouse scaling options.
-    */
-    hwcursor.GameW = w;
-    hwcursor.GameH = h;
-    hwcursor.X = w / 2;
-    hwcursor.Y = h / 2;
-
-    /*
-    ** Ensure cursor clip is in the desired state.
-    */
-    Set_Video_Cursor_Clip(hwcursor.Clip);
-
-    /*
-    ** Update visible cursor scaling.
-    */
-    Update_HWCursor();
-
     return true;
 }
 
@@ -159,54 +134,13 @@ void Toggle_Video_Fullscreen()
     Settings.Video.Windowed = !Settings.Video.Windowed;
 }
 
-void Get_Video_Scale(float& x, float& y)
-{
-    x = 1.0f;
-    y = 1.0f;
-}
-
 void Set_Video_Cursor_Clip(bool clipped)
 {
-    hwcursor.Clip = clipped;
-
-    if (window) {
-        int relative = -1;
-
-        if (relative < 0) {
-            DBG_ERROR("Raw input not supported, disabling.");
-            Settings.Mouse.RawInput = false;
-        }
-    }
-}
-
-void Move_Video_Mouse(float xrel, float yrel)
-{
-    if (Keyboard->Is_Gamepad_Active() || hwcursor.Clip || !Settings.Video.Windowed) {
-        hwcursor.X += xrel * (Settings.Mouse.Sensitivity / 100.0f);
-        hwcursor.Y += yrel * (Settings.Mouse.Sensitivity / 100.0f);
-    }
-
-    if (hwcursor.X >= hwcursor.GameW) {
-        hwcursor.X = hwcursor.GameW - 1;
-    } else if (hwcursor.X < 0) {
-        hwcursor.X = 0;
-    }
-
-    if (hwcursor.Y >= hwcursor.GameH) {
-        hwcursor.Y = hwcursor.GameH - 1;
-    } else if (hwcursor.Y < 0) {
-        hwcursor.Y = 0;
-    }
 }
 
 void Get_Video_Mouse(int& x, int& y)
 {
-    if (Keyboard->Is_Gamepad_Active() || (Settings.Mouse.RawInput && (hwcursor.Clip || !Settings.Video.Windowed))) {
-        x = hwcursor.X;
-        y = hwcursor.Y;
-    } else {
-        SDL_GetMouseState(&x, &y);
-    }
+    SDL_GetMouseState(&x, &y);
 }
 
 /***********************************************************************************************
@@ -234,8 +168,14 @@ void Reset_Video_Mode(void)
     }
 }
 
-static void Update_HWCursor()
+void Set_Video_Cursor(void* cursor, int w, int h, int hotx, int hoty)
 {
+    hwcursor.Raw = cursor;
+    hwcursor.W = w;
+    hwcursor.H = h;
+    hwcursor.HotX = hotx;
+    hwcursor.HotY = hoty;
+
     /*
     ** Allocate or reallocate surface if it has the wrong size.
     */
@@ -251,17 +191,6 @@ static void Update_HWCursor()
 
         SDL_SetColorKey(hwcursor.Surface, SDL_SRCCOLORKEY, 0);
     }
-}
-
-void Set_Video_Cursor(void* cursor, int w, int h, int hotx, int hoty)
-{
-    hwcursor.Raw = cursor;
-    hwcursor.W = w;
-    hwcursor.H = h;
-    hwcursor.HotX = hotx;
-    hwcursor.HotY = hoty;
-
-    Update_HWCursor();
 }
 
 /***********************************************************************************************
@@ -341,11 +270,6 @@ void Set_DD_Palette(void* rpalette)
     }
 
     SDL_SetPalette(window, SDL_PHYSPAL, physpal, 0, 256);
-
-    /*
-    ** Cursor needs to be updated when palette changes.
-    */
-    Update_HWCursor();
 }
 
 /***********************************************************************************************

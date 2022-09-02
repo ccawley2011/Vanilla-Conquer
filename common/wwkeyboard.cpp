@@ -565,9 +565,6 @@ void WWKeyboardClass::Fill_Buffer_From_System(void)
             Put_Key_Message(event.key.keysym.sym, true);
 #endif
             break;
-        case SDL_MOUSEMOTION:
-            Move_Video_Mouse(static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel));
-            break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP: {
             int x, y;
@@ -593,6 +590,7 @@ void WWKeyboardClass::Fill_Buffer_From_System(void)
 #endif
             }
 
+#ifdef SDL2_BUILD
             if (Settings.Mouse.RawInput || Is_Gamepad_Active()) {
                 Get_Video_Mouse(x, y);
             } else {
@@ -601,6 +599,10 @@ void WWKeyboardClass::Fill_Buffer_From_System(void)
                 x = event.button.x / scale_x;
                 y = event.button.y / scale_y;
             }
+#else
+            x = event.button.x;
+            y = event.button.y;
+#endif
 
             Put_Mouse_Message(key, x, y, event.type == SDL_MOUSEBUTTONDOWN ? false : true);
         } break;
@@ -618,6 +620,9 @@ void WWKeyboardClass::Fill_Buffer_From_System(void)
                 Focus_Loss();
                 break;
             }
+            break;
+        case SDL_MOUSEMOTION:
+            Move_Video_Mouse(static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel));
             break;
         case SDL_MOUSEWHEEL:
             if (event.wheel.y > 0) { // scroll up

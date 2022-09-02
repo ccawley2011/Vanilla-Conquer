@@ -61,19 +61,25 @@ public:
 extern SurfaceMonitorClass& AllSurfaces; // List of all surfaces
 
 bool Set_Video_Mode(int w, int h, int bits_per_pixel);
-void Get_Video_Scale(float& x, float& y);
 void Set_Video_Cursor_Clip(bool clipped);
-void Move_Video_Mouse(float xrel, float yrel);
-void Get_Video_Mouse(int& x, int& y);
-void Toggle_Video_Fullscreen();
 void Reset_Video_Mode();
 unsigned Get_Free_Video_Memory();
 void Wait_Blit();
+
+#ifdef SDL2_BUILD
+void Get_Video_Scale(float& x, float& y);
+void Move_Video_Mouse(float xrel, float yrel);
+#endif
+
+#ifdef SDL_BUILD
+void Get_Video_Mouse(int& x, int& y);
+void Toggle_Video_Fullscreen();
 
 /*
 ** Set desired cursor image in game palette.
 */
 void Set_Video_Cursor(void* cursor, int w, int h, int hotx, int hoty);
+#endif
 
 /*
  *  Flags returned by Get_Video_Hardware_Capabilities
