@@ -1,5 +1,6 @@
 find_program(CLANG_FORMAT_EXECUTABLE
-             NAMES clang-format-10
+             NAMES clang-format-11
+                   clang-format-10
                    clang-format-9
                    clang-format
              DOC "clang-format executable")
